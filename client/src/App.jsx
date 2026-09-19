@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { BrowserMultiFormatReader } from '@zxing/browser'
 import './App.css'
 
-const API_URL = 'http://localhost:5000'
+const API_URL = import.meta.env.VITE_API_URL || ''
+const EXAMPLE_BARCODE = '3017624010701'
 
 function App() {
   const [barcode, setBarcode] = useState('')
@@ -146,16 +147,32 @@ function App() {
 
   return (
     <main className="app-shell">
-      <section className="hero-section">
-        <p className="eyebrow">SCANWISE</p>
-        <h1>Scan it. Understand it. Decide smarter.</h1>
+      <header className="site-header">
+        <a className="brand-lockup" href="#top" aria-label="ScanWise home">
+          <span className="brand-mark" aria-hidden="true">S</span>
+          <span>scanwise</span>
+        </a>
+        <span className="header-status">
+          <span className="status-dot" aria-hidden="true" />
+          Open food data, made useful
+        </span>
+      </header>
+
+      <section className="hero-section" id="top">
+        <div className="hero-orbit hero-orbit-one" aria-hidden="true" />
+        <div className="hero-orbit hero-orbit-two" aria-hidden="true" />
+        <p className="eyebrow">YOUR POCKET FOOD COMPASS</p>
+        <h1>Know what’s <em>inside</em> before it’s in your basket.</h1>
         <p className="hero-copy">
-          Look up packaged food products and see their nutrition and ingredient
-          information in one clear place.
+          ScanWise turns a product barcode into a clear nutrition snapshot,
+          plain-language insight, and a smarter comparison in seconds.
         </p>
 
         <form className="search-form" onSubmit={handleSubmit}>
-          <label htmlFor="barcode">Product barcode</label>
+          <div className="form-heading">
+            <label htmlFor="barcode">Find a packaged product</label>
+            <span>8–14 digit barcode</span>
+          </div>
           <div className="search-row">
             <input
               id="barcode"
@@ -167,20 +184,56 @@ function App() {
               aria-describedby="barcode-help"
             />
             <button type="submit" disabled={loading}>
-              {loading ? 'Analyzing…' : 'Analyze product'}
+              {loading ? 'Reading label…' : 'Get product insight'}
             </button>
           </div>
-          <small id="barcode-help">
-            Enter the 8–14 digit barcode printed on the product.
-          </small>
-          <button type="button" className="scan-button" onClick={startScanner}>
-            Scan with camera
-          </button>
+          <div className="form-footer">
+            <small id="barcode-help">Enter the code beneath the barcode.</small>
+            <div className="form-actions">
+              <button type="button" className="example-button" onClick={() => setBarcode(EXAMPLE_BARCODE)}>
+                Try a demo
+              </button>
+              <button type="button" className="scan-button" onClick={startScanner}>
+                <span aria-hidden="true">⌁</span> Scan with camera
+              </button>
+            </div>
+          </div>
         </form>
+
+        <ul className="trust-list" aria-label="ScanWise benefits">
+          <li><span aria-hidden="true">✓</span> Transparent scoring</li>
+          <li><span aria-hidden="true">✓</span> Compare side by side</li>
+          <li><span aria-hidden="true">✓</span> Open Food Facts data</li>
+        </ul>
 
         {error && <p className="message error-message">{error}</p>}
         {scannerError && <p className="message error-message">{scannerError}</p>}
       </section>
+
+      {!product && !loading && (
+        <section className="starter-grid" aria-label="How ScanWise works">
+          <article className="starter-card starter-card-featured">
+            <p className="eyebrow">THE SCANWISE WAY</p>
+            <h2>A label is data. A decision needs context.</h2>
+            <p>We make the nutrition facts on packaged food easier to read, compare, and act on.</p>
+          </article>
+          <article className="starter-card">
+            <span className="starter-number">01</span>
+            <h3>Look it up</h3>
+            <p>Type a barcode or use your camera.</p>
+          </article>
+          <article className="starter-card">
+            <span className="starter-number">02</span>
+            <h3>See the signal</h3>
+            <p>Get a transparent score and the factors behind it.</p>
+          </article>
+          <article className="starter-card">
+            <span className="starter-number">03</span>
+            <h3>Choose wisely</h3>
+            <p>Compare products before you buy.</p>
+          </article>
+        </section>
+      )}
 
       {scannerOpen && (
         <section className="scanner-panel" aria-label="Camera barcode scanner">
@@ -189,7 +242,10 @@ function App() {
             <h2>Point your camera at the barcode</h2>
             <p>Hold the barcode inside the camera frame until ScanWise finds it.</p>
           </div>
-          <video ref={videoRef} className="scanner-video" muted playsInline />
+          <div className="scanner-frame">
+            <video ref={videoRef} className="scanner-video" muted playsInline />
+            <span className="scan-line" aria-hidden="true" />
+          </div>
           <button type="button" className="close-scanner" onClick={stopScanner}>
             Stop camera
           </button>
@@ -238,7 +294,7 @@ function App() {
 
           {product.insight && (
             <section className="insight-card" aria-label="ScanWise product insight">
-              <div className="insight-score">
+              <div className={`insight-score insight-${product.insight.label.toLowerCase().replaceAll(' ', '-')}`}>
                 <span>{product.insight.score}</span>
                 <small>/ 100</small>
               </div>

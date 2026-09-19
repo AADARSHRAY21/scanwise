@@ -1,0 +1,13 @@
+version: 1.0
+runtime: nodejs22
+build:
+  commands:
+    build:
+      - npm --prefix client ci
+      - npm --prefix client run build
+      - npm --prefix server ci --omit=dev
+run:
+  command: node server/server.js
+  network:
+    port: 8080
+    env: PORT
