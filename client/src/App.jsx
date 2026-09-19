@@ -11,6 +11,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [scannerOpen, setScannerOpen] = useState(false)
   const [scannerError, setScannerError] = useState('')
+  const [comparisonProducts, setComparisonProducts] = useState([])
   const videoRef = useRef(null)
   const scannerControlsRef = useRef(null)
 
@@ -55,6 +56,52 @@ function App() {
   async function handleSubmit(event) {
     event.preventDefault()
     await lookupProduct(barcode)
+  }
+
+  function addToComparison() {
+    if (!product) return
+
+    if (comparisonProducts.some((item) => item.barcode === product.barcode)) {
+      setError('This product is already in your comparison.')
+      return
+    }
+
+    if (comparisonProducts.length === 2) {
+      setError('Remove a product before adding another one.')
+      return
+    }
+
+    setError('')
+    setComparisonProducts((items) => [...items, product])
+  }
+
+  function removeFromComparison(barcodeToRemove) {
+    setComparisonProducts((items) =>
+      items.filter((item) => item.barcode !== barcodeToRemove)
+    )
+  }
+
+  function comparisonSummary() {
+    if (comparisonProducts.length < 2) {
+      return 'Add one more product to see a side-by-side nutrition comparison.'
+    }
+
+    const [firstProduct, secondProduct] = comparisonProducts
+    const firstScore = firstProduct.insight?.score
+    const secondScore = secondProduct.insight?.score
+
+    if (typeof firstScore !== 'number' || typeof secondScore !== 'number') {
+      return 'Both products need a ScanWise Insight score before they can be compared.'
+    }
+
+    if (firstScore === secondScore) {
+      return 'Both products have the same ScanWise Insight score.'
+    }
+
+    const higherProduct = firstScore > secondScore ? firstProduct : secondProduct
+    const difference = Math.abs(firstScore - secondScore)
+
+    return `${higherProduct.name} has a ${difference}-point higher ScanWise Insight score.`
   }
 
   function stopScanner() {
@@ -174,6 +221,18 @@ function App() {
               )}
 
               <p className="barcode-label">Barcode: {product.barcode}</p>
+              <button
+                type="button"
+                className="compare-button"
+                onClick={addToComparison}
+                disabled={comparisonProducts.some(
+                  (item) => item.barcode === product.barcode
+                )}
+              >
+                {comparisonProducts.some((item) => item.barcode === product.barcode)
+                  ? 'Added to comparison'
+                  : 'Add to comparison'}
+              </button>
             </div>
           </div>
 
@@ -254,6 +313,81 @@ function App() {
             Data provided by {product.source}. ScanWise Insight is informational,
             not medical advice.
           </p>
+        </section>
+      )}
+
+      {comparisonProducts.length > 0 && (
+        <section className="comparison-card" aria-live="polite">
+          <div className="comparison-heading">
+            <div>
+              <p className="eyebrow">PRODUCT COMPARISON</p>
+              <h2>Choose with context</h2>
+              <p>{comparisonSummary()}</p>
+            </div>
+            <span className="comparison-count">
+              {comparisonProducts.length} / 2 products
+            </span>
+          </div>
+
+          <div className="comparison-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nutrition per 100 g</th>
+                  {comparisonProducts.map((item) => (
+                    <th key={item.barcode}>
+                      <span>{item.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeFromComparison(item.barcode)}
+                        aria-label={`Remove ${item.name} from comparison`}
+                      >
+                        Remove
+                      </button>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>ScanWise Insight</th>
+                  {comparisonProducts.map((item) => (
+                    <td key={item.barcode}>{item.insight?.score ?? '—'} / 100</td>
+                  ))}
+                </tr>
+                <tr>
+                  <th>Calories</th>
+                  {comparisonProducts.map((item) => (
+                    <td key={item.barcode}>{item.nutrition.calories ?? '—'} kcal</td>
+                  ))}
+                </tr>
+                <tr>
+                  <th>Sugars</th>
+                  {comparisonProducts.map((item) => (
+                    <td key={item.barcode}>{item.nutrition.sugars ?? '—'} g</td>
+                  ))}
+                </tr>
+                <tr>
+                  <th>Saturated fat</th>
+                  {comparisonProducts.map((item) => (
+                    <td key={item.barcode}>{item.nutrition.saturatedFat ?? '—'} g</td>
+                  ))}
+                </tr>
+                <tr>
+                  <th>Fibre</th>
+                  {comparisonProducts.map((item) => (
+                    <td key={item.barcode}>{item.nutrition.fiber ?? '—'} g</td>
+                  ))}
+                </tr>
+                <tr>
+                  <th>Protein</th>
+                  {comparisonProducts.map((item) => (
+                    <td key={item.barcode}>{item.nutrition.protein ?? '—'} g</td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
     </main>

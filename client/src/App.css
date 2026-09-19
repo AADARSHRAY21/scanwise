@@ -244,6 +244,30 @@ h1 {
   border-radius: 999px;
 }
 
+.compare-button {
+  display: block;
+  margin-top: 14px;
+  padding: 9px 12px;
+  color: #286044;
+  font-weight: 700;
+  background: #ffffff;
+  border: 1px solid #78ad81;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.compare-button:hover:not(:disabled) {
+  color: #ffffff;
+  background: #286044;
+}
+
+.compare-button:disabled {
+  color: #66766d;
+  cursor: default;
+  background: #edf4ed;
+  border-color: #cfe0d1;
+}
+
 .insight-card {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -363,6 +387,89 @@ h1 {
   font-size: 0.85rem;
 }
 
+.comparison-card {
+  margin-top: 32px;
+  padding: 32px;
+  background: #ffffff;
+  border: 1px solid #d9e4da;
+  border-radius: 20px;
+  box-shadow: 0 16px 40px rgb(27 57 42 / 8%);
+}
+
+.comparison-heading {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.comparison-heading h2 {
+  margin: 0 0 8px;
+}
+
+.comparison-heading p:not(.eyebrow) {
+  max-width: 650px;
+  margin: 0;
+  color: #5f7068;
+}
+
+.comparison-count {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  color: #286044;
+  font-size: 0.85rem;
+  font-weight: 800;
+  background: #e1f3e6;
+  border-radius: 999px;
+}
+
+.comparison-table-wrap {
+  overflow-x: auto;
+}
+
+.comparison-card table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.comparison-card th,
+.comparison-card td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #e2ebe3;
+}
+
+.comparison-card thead th {
+  color: #183029;
+  background: #f2f7f1;
+}
+
+.comparison-card thead th:not(:first-child) {
+  min-width: 190px;
+}
+
+.comparison-card thead span {
+  display: block;
+  margin-bottom: 7px;
+}
+
+.comparison-card thead button {
+  padding: 0;
+  color: #8a2632;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.comparison-card tbody th {
+  color: #51635a;
+  font-size: 0.9rem;
+}
+
 @media (max-width: 700px) {
   .app-shell {
     width: min(100% - 24px, 1100px);
@@ -398,6 +505,14 @@ h1 {
 
   .scanner-panel {
     grid-template-columns: 1fr;
+  }
+
+  .comparison-card {
+    padding: 20px;
+  }
+
+  .comparison-heading {
+    flex-direction: column;
   }
 
   .close-scanner {
