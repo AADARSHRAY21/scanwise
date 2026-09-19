@@ -1,5 +1,6 @@
 const express = require("express");
 const { getProductByBarcode } = require("../services/openFoodFactsService");
+const { getProductInsight } = require("../services/scoringService");
 
 const router = express.Router();
 
@@ -26,6 +27,17 @@ router.get("/:barcode", async (req, res) => {
 
     const product = data.product;
 
+    const nutrition = {
+      calories: product.nutriments?.["energy-kcal_100g"] ?? null,
+      protein: product.nutriments?.proteins_100g ?? null,
+      carbohydrates: product.nutriments?.carbohydrates_100g ?? null,
+      sugars: product.nutriments?.sugars_100g ?? null,
+      fat: product.nutriments?.fat_100g ?? null,
+      saturatedFat: product.nutriments?.["saturated-fat_100g"] ?? null,
+      fiber: product.nutriments?.fiber_100g ?? null,
+      sodium: product.nutriments?.sodium_100g ?? null,
+    };
+
     res.json({
       success: true,
       product: {
@@ -34,17 +46,8 @@ router.get("/:barcode", async (req, res) => {
         brand: product.brands || "Unknown brand",
         image: product.image_front_url || null,
 
-        nutrition: {
-          calories: product.nutriments?.["energy-kcal_100g"] ?? null,
-          protein: product.nutriments?.proteins_100g ?? null,
-          carbohydrates: product.nutriments?.carbohydrates_100g ?? null,
-          sugars: product.nutriments?.sugars_100g ?? null,
-          fat: product.nutriments?.fat_100g ?? null,
-          saturatedFat:
-            product.nutriments?.["saturated-fat_100g"] ?? null,
-          fiber: product.nutriments?.fiber_100g ?? null,
-          sodium: product.nutriments?.sodium_100g ?? null,
-        },
+        nutrition,
+        insight: getProductInsight(nutrition),
 
         ingredients: product.ingredients_text || "",
         categories: product.categories || "",

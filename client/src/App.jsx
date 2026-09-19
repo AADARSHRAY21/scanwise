@@ -107,6 +107,27 @@ function App() {
             </div>
           </div>
 
+          {product.insight && (
+            <section className="insight-card" aria-label="ScanWise product insight">
+              <div className="insight-score">
+                <span>{product.insight.score}</span>
+                <small>/ 100</small>
+              </div>
+              <div>
+                <p className="eyebrow">SCANWISE INSIGHT</p>
+                <h3>{product.insight.label}</h3>
+                <p>{product.insight.summary}</p>
+              </div>
+              <ul className="insight-factors">
+                {product.insight.scoreFactors.map((factor) => (
+                  <li key={factor.text} className={`factor-${factor.tone}`}>
+                    {factor.text}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
           <div className="details-grid">
             <section>
               <h3>Nutrition per 100 g</h3>
@@ -159,7 +180,10 @@ function App() {
             </section>
           </div>
 
-          <p className="source">Data provided by {product.source}.</p>
+          <p className="source">
+            Data provided by {product.source}. ScanWise Insight is informational,
+            not medical advice.
+          </p>
         </section>
       )}
     </main>

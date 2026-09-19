@@ -188,6 +188,79 @@ h1 {
   border-radius: 999px;
 }
 
+.insight-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 20px;
+  align-items: center;
+  margin-top: 28px;
+  padding: 22px;
+  background: #edf6ef;
+  border: 1px solid #cfe0d1;
+  border-radius: 14px;
+}
+
+.insight-card h3 {
+  margin: 0 0 6px;
+}
+
+.insight-card p:not(.eyebrow) {
+  margin: 0;
+  color: #51635a;
+}
+
+.insight-score {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  color: #17442d;
+  background: #ffffff;
+  border: 6px solid #78ad81;
+  border-radius: 50%;
+}
+
+.insight-score span {
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.insight-score small {
+  margin-top: -14px;
+  color: #697870;
+}
+
+.insight-factors {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.insight-factors li {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.92rem;
+}
+
+.factor-limit {
+  color: #7c2c25;
+  background: #fff0ee;
+}
+
+.factor-positive {
+  color: #1a5c38;
+  background: #e1f3e6;
+}
+
+.factor-neutral {
+  color: #51635a;
+  background: #f5f8f2;
+}
+
 .details-grid {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
@@ -243,6 +316,10 @@ h1 {
   .search-row,
   .product-summary {
     flex-direction: column;
+  }
+
+  .insight-card {
+    grid-template-columns: 1fr;
   }
 
   .search-row button {
