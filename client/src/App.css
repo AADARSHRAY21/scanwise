@@ -118,6 +118,24 @@ h1 {
   color: #697870;
 }
 
+.scan-button,
+.close-scanner {
+  margin-top: 14px;
+  padding: 10px 14px;
+  color: #286044;
+  font-weight: 700;
+  background: transparent;
+  border: 1px solid #78ad81;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.scan-button:hover,
+.close-scanner:hover {
+  color: #ffffff;
+  background: #286044;
+}
+
 .message {
   margin: 18px 0 0;
   padding: 13px 16px;
@@ -127,6 +145,44 @@ h1 {
 .error-message {
   color: #8a2632;
   background: #fff0f1;
+}
+
+.scanner-panel {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px 28px;
+  align-items: center;
+  margin: 0 auto 40px;
+  padding: 24px;
+  text-align: left;
+  background: #ffffff;
+  border: 1px solid #d9e4da;
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgb(27 57 42 / 8%);
+}
+
+.scanner-panel h2 {
+  margin: 0 0 8px;
+}
+
+.scanner-panel p:not(.eyebrow) {
+  margin: 0;
+  color: #5f7068;
+  line-height: 1.5;
+}
+
+.scanner-video {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+  background: #183029;
+  border-radius: 12px;
+}
+
+.close-scanner {
+  justify-self: end;
+  margin-top: 0;
 }
 
 .product-card {
@@ -338,5 +394,13 @@ h1 {
   .product-card,
   .search-form {
     padding: 20px;
+  }
+
+  .scanner-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .close-scanner {
+    justify-self: start;
   }
 }

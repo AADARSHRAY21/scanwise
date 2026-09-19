@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { BrowserMultiFormatReader } from '@zxing/browser'
 import './App.css'
 
 const API_URL = 'http://localhost:5000'
@@ -8,16 +9,21 @@ function App() {
   const [product, setProduct] = useState(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [scannerOpen, setScannerOpen] = useState(false)
+  const [scannerError, setScannerError] = useState('')
+  const videoRef = useRef(null)
+  const scannerControlsRef = useRef(null)
 
-  async function handleSubmit(event) {
-    event.preventDefault()
+  useEffect(() => {
+    return () => scannerControlsRef.current?.stop()
+  }, [])
 
-    const cleanBarcode = barcode.trim()
-
+  async function lookupProduct(rawBarcode) {
+    const cleanBarcode = rawBarcode.trim()
     if (!/^\d{8,14}$/.test(cleanBarcode)) {
       setProduct(null)
       setError('Enter a valid 8–14 digit barcode.')
-      return
+      return false
     }
 
     setLoading(true)
@@ -35,6 +41,7 @@ function App() {
       }
 
       setProduct(data.product)
+      return true
     } catch (requestError) {
       setError(
         requestError.message ||
@@ -42,6 +49,51 @@ function App() {
       )
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault()
+    await lookupProduct(barcode)
+  }
+
+  function stopScanner() {
+    scannerControlsRef.current?.stop()
+    scannerControlsRef.current = null
+    setScannerOpen(false)
+  }
+
+  async function startScanner() {
+    setError('')
+    setScannerError('')
+    setScannerOpen(true)
+
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+
+    try {
+      const codeReader = new BrowserMultiFormatReader()
+      const controls = await codeReader.decodeFromConstraints(
+        {
+          audio: false,
+          video: { facingMode: { ideal: 'environment' } },
+        },
+        videoRef.current,
+        async (result) => {
+          if (!result) return
+
+          const scannedBarcode = result.getText()
+          stopScanner()
+          setBarcode(scannedBarcode)
+          await lookupProduct(scannedBarcode)
+        }
+      )
+
+      scannerControlsRef.current = controls
+    } catch (cameraError) {
+      setScannerError(
+        'Camera access was unavailable. Allow camera access, then try again.'
+      )
+      setScannerOpen(false)
     }
   }
 
@@ -74,10 +126,28 @@ function App() {
           <small id="barcode-help">
             Enter the 8–14 digit barcode printed on the product.
           </small>
+          <button type="button" className="scan-button" onClick={startScanner}>
+            Scan with camera
+          </button>
         </form>
 
         {error && <p className="message error-message">{error}</p>}
+        {scannerError && <p className="message error-message">{scannerError}</p>}
       </section>
+
+      {scannerOpen && (
+        <section className="scanner-panel" aria-label="Camera barcode scanner">
+          <div>
+            <p className="eyebrow">CAMERA SCANNER</p>
+            <h2>Point your camera at the barcode</h2>
+            <p>Hold the barcode inside the camera frame until ScanWise finds it.</p>
+          </div>
+          <video ref={videoRef} className="scanner-video" muted playsInline />
+          <button type="button" className="close-scanner" onClick={stopScanner}>
+            Stop camera
+          </button>
+        </section>
+      )}
 
       {product && (
         <section className="product-card" aria-live="polite">
